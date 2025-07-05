@@ -32,6 +32,7 @@ const sendMessage = () => {
     )
   }
 }
+console.log("test")
 </script>
 
 <template>
