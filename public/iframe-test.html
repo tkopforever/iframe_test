@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iframe Test Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .message-box {
+      background-color: white;
+      border: 1px solid #ddd;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 4px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #42b983;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>Iframe Test Page</h2>
+  <button id="sendMessage">Send Message to Parent</button>
+  <div class="message-box">
+    <h3>Received Messages:</h3>
+    <div id="messages"></div>
+  </div>
+
+  <script>
+    const sendBtn = document.getElementById('sendMessage');
+    const messagesDiv = document.getElementById('messages');
+
+    // Listen for messages from parent
+    window.addEventListener('message', (event) => {
+      if (event.origin !== window.location.origin) return;
+      
+      const message = document.createElement('div');
+      message.textContent = `Received: ${JSON.stringify(event.data)}`;
+      messagesDiv.appendChild(message);
+      
+      // Send response back to parent
+      window.parent.postMessage({
+        type: 'response',
+        message: 'Message received in iframe!',
+        originalMessage: event.data
+      }, window.location.origin);
+    });
+
+    // Send message to parent
+    sendBtn.addEventListener('click', () => {
+      window.parent.postMessage({
+        type: 'from-iframe',
+        message: 'Hello from iframe!',
+        timestamp: new Date().toISOString()
+      }, window.location.origin);
+    });
+  </script>
+</body>
+</html>
