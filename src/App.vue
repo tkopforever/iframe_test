@@ -7,7 +7,6 @@ const iframeRef = ref<HTMLIFrameElement | null>(null)
 
 /**
  * 监听 iframe 加载完成事件
- *
  * 监听页面中的消息事件，当接收到来自 iframe 的消息时，
  * 会检查消息的来源是否与当前页面的来源一致，如果一致则输出消息内容。
  */
@@ -25,9 +24,13 @@ const onIframeLoad = () => {
  * 如果 iframeRef.value?.contentWindow 存在，则发送消息；否则，不执行任何操作。
  */
 const sendMessage = () => {
+  const link = prompt('请输入要发送给iframe的HTTP链接', 'https://example.com')
   if (iframeRef.value?.contentWindow) {
     iframeRef.value.contentWindow.postMessage(
-      { type: 'test', message: 'Hello from parent!' },
+      {
+        type: 'display-link',
+        link: link || null
+      },
       window.location.origin
     )
   }
@@ -35,27 +38,41 @@ const sendMessage = () => {
 </script>
 
 <template>
-  <div class="iframe-test">
-    <button @click="sendMessage">发送message到iframe</button>
-    <iframe ref="iframeRef" src="/iframe-test.html" @load="onIframeLoad"
-      style="width: 100%; height: 300px; border: 1px solid #ccc; margin: 20px 0;"></iframe>
-  </div>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+  <div class="main-container">
+    <div class="iframe-full-row">
+      <button @click="sendMessage">发送message到iframe</button>
+      <iframe ref="iframeRef" src="/iframe-test.html" @load="onIframeLoad"
+        style="width: 100%; height: 400px; border: 1px solid #ccc;"></iframe>
     </div>
-  </header>
-
-  <RouterView />
+  </div>
 </template>
 
 <style scoped>
+.main-container {
+  width: 100%;
+}
+
+.iframe-full-row {
+  margin-bottom: 20px;
+}
+
+.content-below {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .content-below {
+    flex-direction: column;
+  }
+}
+
+.wrapper {
+  flex: 1;
+}
+
 header {
   line-height: 1.5;
   max-height: 100vh;
@@ -63,14 +80,7 @@ header {
 
 .logo {
   display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+  margin: 0 2rem 0 0;
 }
 
 nav a.router-link-exact-active {
@@ -98,10 +108,6 @@ nav a:first-of-type {
     padding-right: calc(var(--section-gap) / 2);
   }
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
   header .wrapper {
     display: flex;
     place-items: flex-start;
@@ -112,9 +118,9 @@ nav a:first-of-type {
     text-align: left;
     margin-left: -1rem;
     font-size: 1rem;
-
     padding: 1rem 0;
     margin-top: 1rem;
+    width: 100%;
   }
 }
 </style>
